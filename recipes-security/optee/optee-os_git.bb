@@ -7,6 +7,7 @@ DEPENDS = "python-pycrypto-native"
 
 SRC_URI = "git://github.com/OP-TEE/optee_os.git \
     file://0001-allow-setting-sysroot-for-libgcc-lookup.patch \
+    file://sks-support.patch \
 "
 
 PV = "3.4.0+git${SRCPV}"
@@ -25,8 +26,10 @@ OPTEE_ARCH_aarch64 = "arm64"
 
 EXTRA_OEMAKE = "PLATFORM=${OPTEEMACHINE} O=out/arm \
                 CROSS_COMPILE_core=${HOST_PREFIX} \
-                DEBUG=0 CFG_PM_DEBUG=0 LDFLAGS= \
+                DEBUG=1 CFG_PM_DEBUG=0 LDFLAGS= \
+                CFG_TEE_CORE_LOG_LEVEL=4 CFG_TEE_CORE_TA_TRACE=y CFG_TEE_TA_LOG_LEVEL=4 \
                 LIBGCC_LOCATE_CFLAGS=--sysroot=${STAGING_DIR_HOST} \
+                CFG_SECURE_KEY_SERVICES=y \
 "
 EXTRA_OEMAKE_append_aarch64 = " \
                 CFG_ARM64_core=y \
