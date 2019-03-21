@@ -9,6 +9,7 @@ inherit pythonnative
 
 SRC_URI = "git://github.com/OP-TEE/optee_test.git \
     file://allow-custom-bin-lib-dir.patch \
+    file://sks-support.patch \
 "
 
 PV = "3.4.0+git${SRCPV}"
@@ -19,11 +20,13 @@ S = "${WORKDIR}/git"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 OPTEE_CLIENT_EXPORT = "${STAGING_DIR_HOST}${prefix}"
+OPTEE_SKS_HEADERS   = "${STAGING_DIR_HOST}${prefix}"
 TEEC_EXPORT         = "${STAGING_DIR_HOST}${prefix}"
 TA_DEV_KIT_DIR      = "${STAGING_INCDIR}/optee/export-user_ta"
 
 EXTRA_OEMAKE = "TA_DEV_KIT_DIR=${TA_DEV_KIT_DIR} \
                 OPTEE_CLIENT_EXPORT=${OPTEE_CLIENT_EXPORT} \
+                OPTEE_SKS_HEADERS=${OPTEE_SKS_HEADERS} \
                 TEEC_EXPORT=${TEEC_EXPORT} \
                 CROSS_COMPILE_HOST=${TARGET_PREFIX} \
                 CROSS_COMPILE_TA=${TARGET_PREFIX} \
