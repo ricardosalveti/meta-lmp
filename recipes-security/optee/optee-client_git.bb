@@ -4,7 +4,9 @@ LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=69663ab153298557a59c67a60a743e5b"
 
 SRC_URI = "git://github.com/OP-TEE/optee_client.git \
-           file://tee-supplicant.service"
+           file://tee-supplicant.service \
+           file://sks-support.patch \
+"
 
 PV = "3.4.0+git${SRCPV}"
 SRCREV = "34d4375ab4460ad3af83c0af8ff35d6b391b75b3"
