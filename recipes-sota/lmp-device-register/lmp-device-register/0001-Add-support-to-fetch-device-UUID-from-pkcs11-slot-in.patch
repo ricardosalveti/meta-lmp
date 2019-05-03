@@ -1,0 +1,73 @@
+From 8a6b31cd5058e06c79aed3d5671c1d5cad0fed90 Mon Sep 17 00:00:00 2001
+From: Ricardo Salveti <ricardo@foundries.io>
+Date: Thu, 2 May 2019 23:48:58 -0300
+Subject: [PATCH] Add support to fetch device UUID from pkcs11 slot information
+
+Signed-off-by: Ricardo Salveti <ricardo@foundries.io>
+---
+ src/main.cpp | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
+
+diff --git a/src/main.cpp b/src/main.cpp
+index 10befa1..cec6110 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -13,6 +13,7 @@
+ #include <iostream>
+ #include <sstream>
+ #include <string>
++#include <regex>
+ 
+ #include <boost/algorithm/string.hpp>
+ #include <boost/beast/core/detail/base64.hpp>
+@@ -253,14 +254,14 @@ static string _spawn(const string& cmd_line)
+ 	return stdout_buff;
+ }
+ 
+-static void _pkcs11_tool(const string &module, const string &cmd)
++static string _pkcs11_tool(const string &module, const string &cmd)
+ {
+-	_spawn("pkcs11-tool --module " + module + " " + cmd);
++	return _spawn("pkcs11-tool --module " + module + " " + cmd);
+ }
+ 
+-static void _pkcs11_tool(const string &module, const string &cmd, const string &pin)
++static string _pkcs11_tool(const string &module, const string &cmd, const string &pin)
+ {
+-	_pkcs11_tool(module, "--pin " + pin + " " + cmd);
++	return _pkcs11_tool(module, "--pin " + pin + " " + cmd);
+ }
+ 
+ static void _setenv(const char *name, const char *value)
+@@ -327,8 +328,17 @@ static std::tuple<string, string, string> _create_cert(const string &stream, con
+ 	// Ensure a UUID is available.
+ 	string uuid;
+ 	if (device_uuid.empty()) {
+-		boost::uuids::uuid tmp = boost::uuids::random_generator()();
+-		uuid = boost::uuids::to_string(tmp);
++		// Fetch from PKCS11 if available as part of the slot information
++		string slot_info = _pkcs11_tool(hsm_module, "--list-slots");
++		std::regex re("(Slot .*: )([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})");
++		std::smatch match;
++		std::regex_search(slot_info, match, re);
++		if (match.size() > 2) {
++			uuid = match.str(2);
++		} else {
++			boost::uuids::uuid tmp = boost::uuids::random_generator()();
++			uuid = boost::uuids::to_string(tmp);
++		}
+ 	} else {
+ 		uuid = device_uuid;
+ 	}
+@@ -485,7 +495,7 @@ int main(int argc, char **argv)
+ 	string final_uuid, pkey, csr;
+ 	std::tie(final_uuid, pkey, csr) = _create_cert(stream, uuid, hsm_module, hsm_so_pin, hsm_pin);
+ 	if (uuid.empty()) {
+-		cout << "Generated device UUID: " << final_uuid << endl;
++		cout << "Device UUID: " << final_uuid << endl;
+ 	}
+ 
+ 	string token = _get_oauth_token(final_uuid);
+-- 
+2.17.1
+

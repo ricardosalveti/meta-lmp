@@ -6,7 +6,9 @@ DEPENDS = "boost curl ostree glib-2.0"
 
 SRCREV = "d29847e3aaf9ac707b512a75429cf0b103f4f05d"
 
-SRC_URI = "git://github.com/foundriesio/lmp-device-register.git;protocol=https"
+SRC_URI = "git://github.com/foundriesio/lmp-device-register.git;protocol=https \
+           file://0001-Add-support-to-fetch-device-UUID-from-pkcs11-slot-in.patch \
+"
 
 S = "${WORKDIR}/git"
 
