@@ -7,7 +7,9 @@ inherit python3native
 
 DEPENDS = "python3-pycrypto-native virtual/optee-os optee-client"
 
-SRC_URI = "git://github.com/foundriesio/optee-sks.git"
+SRC_URI = "git://github.com/foundriesio/optee-sks.git \
+	   file://0001-libsks-serialize_ck-improve-ulong-handling.patch \
+"
 SRCREV = "d1235b0d8cd74d6e0f8b0a011dd1356ca7de0de9"
 
 S = "${WORKDIR}/git"
@@ -28,7 +30,7 @@ EXTRA_OEMAKE = "TA_DEV_KIT_DIR=${TA_DEV_KIT_DIR} \
                 OPTEE_CLIENT_EXPORT=${OPTEE_CLIENT_EXPORT} \
                 TEEC_EXPORT=${TEEC_EXPORT} \
                 HOST_CROSS_COMPILE=${TARGET_PREFIX} \
-                TA_CROSS_COMPILE=${TARGET_PREFIX} \
+                TA_CROSS_COMPILE=${TARGET_PREFIX} DEBUG=1 \
 "
 EXTRA_OEMAKE += "${@oe.utils.ifelse('${OPTEE_TA_SIGN_KEY}' != '', 'TA_SIGN_KEY=${OPTEE_TA_SIGN_KEY}', '')}"
 

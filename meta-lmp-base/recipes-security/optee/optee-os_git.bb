@@ -6,13 +6,13 @@ LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=c1f21c4f72f372ef38a5a4aee55ec173"
 
 DEPENDS = "python3-pycrypto-native python3-pyelftools-native"
 
-SRC_URI = "git://github.com/foundriesio/optee_os.git;branch=${SRCBRANCH} \
+SRC_URI = "git://github.com/ricardosalveti/optee_os.git;branch=${SRCBRANCH} \
 	file://0001-arm64-Disable-outline-atomics-when-compiling.patch \
 "
 
 PV = "3.6.0+git"
-SRCREV = "51586b13116819e65f97c1f4f56658eb75a4a684"
-SRCBRANCH = "3.6.0+fio"
+SRCREV = "${AUTOREV}"
+SRCBRANCH = "3.6.0+fio-rsalveti"
 
 S = "${WORKDIR}/git"
 
@@ -35,9 +35,9 @@ OPTEE_ARCH_aarch64 = "arm64"
 
 EXTRA_OEMAKE = "PLATFORM=${OPTEEMACHINE} O=out/arm \
                 CROSS_COMPILE_core=${HOST_PREFIX} \
-                CFG_WERROR=y DEBUG=0 LDFLAGS= \
+                CFG_WERROR=y DEBUG=1 LDFLAGS= \
                 LIBGCC_LOCATE_CFLAGS=--sysroot=${STAGING_DIR_HOST} \
-                CFG_TEE_CORE_LOG_LEVEL=2 CFG_TEE_TA_LOG_LEVEL=2 \
+                CFG_TEE_CORE_LOG_LEVEL=4 CFG_TEE_CORE_TA_TRACE=y CFG_TEE_TA_LOG_LEVEL=4 \
 "
 EXTRA_OEMAKE += "${@oe.utils.ifelse('${OPTEE_TA_SIGN_KEY}' != '', 'TA_SIGN_KEY=${OPTEE_TA_SIGN_KEY}', '')}"
 

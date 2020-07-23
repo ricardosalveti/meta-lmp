@@ -1,0 +1,60 @@
+From 314d92d818406a325d0447c7cfd18f747a54b84e Mon Sep 17 00:00:00 2001
+From: Ricardo Salveti <ricardo@foundries.io>
+Date: Thu, 23 Jul 2020 20:00:44 -0300
+Subject: [PATCH] libsks: serialize_ck: improve ulong handling
+
+Signed-off-by: Ricardo Salveti <ricardo@foundries.io>
+---
+ libsks/src/serialize_ck.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
+
+diff --git a/libsks/src/serialize_ck.c b/libsks/src/serialize_ck.c
+index a87bfe56..c56eef93 100644
+--- a/libsks/src/serialize_ck.c
++++ b/libsks/src/serialize_ck.c
+@@ -197,10 +197,8 @@ static CK_RV serialize_ck_attribute(struct serializer *obj, CK_ATTRIBUTE *attr)
+ 
+ 	if (ck_attr_is_ulong(attr->type)) {
+ 		/* PKCS#11 CK_ULONG are use */
+-		if (attr->ulValueLen != sizeof(CK_ULONG))
+-			return CKR_ATTRIBUTE_TYPE_INVALID;
+-
+-		memcpy(&ck_ulong, attr->pValue, sizeof(ck_ulong));
++		if (attr->ulValueLen)
++			memcpy(&ck_ulong, attr->pValue, sizeof(ck_ulong));
+ 	}
+ 
+ 	switch (attr->type) {
+@@ -502,6 +500,14 @@ static CK_RV deserialize_ck_attribute(struct sks_attribute_head *in,
+ 	if (rv)
+ 		return rv;
+ 
++	/* Specific ulong encoded as 32bit in SKS TA API */
++	if (ck_attr_is_ulong(out->type)) {
++		if (out->ulValueLen != sizeof(CK_ULONG))
++			 out->ulValueLen = sizeof(CK_ULONG);
++
++		memcpy(&sks_data32, in->data, sizeof(uint32_t));
++	}
++
+ 	if (out->ulValueLen < in->size) {
+ 		out->ulValueLen = in->size;
+ 		return CKR_OK;
+@@ -510,14 +516,6 @@ static CK_RV deserialize_ck_attribute(struct sks_attribute_head *in,
+ 	if (!out->pValue)
+ 		return CKR_OK;
+ 
+-	/* Specific ulong encoded as 32bit in SKS TA API */
+-	if (ck_attr_is_ulong(out->type)) {
+-		if (out->ulValueLen != sizeof(CK_ULONG))
+-			return CKR_ATTRIBUTE_TYPE_INVALID;
+-
+-		memcpy(&sks_data32, in->data, sizeof(uint32_t));
+-	}
+-
+ 	switch (out->type) {
+ 	case CKA_CLASS:
+ 		rv = sks2ck_object_class(&ck_ulong, sks_data32);
+-- 
+2.27.0
+

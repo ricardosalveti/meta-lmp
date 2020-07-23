@@ -9,6 +9,7 @@ SRC_URI = "git://${GO_IMPORT} \
 	file://fioconfig.service \
 	file://fioconfig.path \
 	file://fioconfig-extract.service \
+	file://0001-set-max-sessions-to-2.patch \
 "
 SRCREV = "e70e6ab464660cf6a2e75b7b75da939abb5cc35f"
 
