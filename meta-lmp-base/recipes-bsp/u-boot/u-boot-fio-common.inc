@@ -10,8 +10,9 @@ DEPENDS += "flex-native bison-native bc-native dtc-native"
 
 SRC_URI = "git://github.com/foundriesio/u-boot.git;branch=${SRCBRANCH} \
     file://fw_env.config \
-    file://lmp.cfg \
 "
+SRC_URI_append_lmp = " file://lmp.cfg"
+SRC_URI_append_lmp-base = " file://lmp-base.cfg"
 
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
