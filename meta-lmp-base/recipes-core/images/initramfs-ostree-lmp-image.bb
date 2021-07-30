@@ -3,6 +3,7 @@ DESCRIPTION = "Linux microPlatform OSTree initramfs image"
 PACKAGE_INSTALL = "initramfs-framework-base \
 	initramfs-module-udev \
 	initramfs-module-rootfs \
+	initramfs-module-debug \
 	initramfs-module-ostree \
 	initramfs-module-ostree-factory-reset \
 	${VIRTUAL-RUNTIME_base-utils} \

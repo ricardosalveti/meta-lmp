@@ -315,7 +315,7 @@ IMXBOOT_TARGETS_mx8mm = "flash_evk_spl"
 ## iMX8MM EVK
 KERNEL_DEVICETREE_append_imx8mm-lpddr4-evk = " freescale/imx8mm-evkb.dtb"
 KMACHINE_imx8mm-lpddr4-evk = "imx8mmevk"
-OSTREE_KERNEL_ARGS_imx8mm-lpddr4-evk ?= "console=tty1 console=ttymxc1,115200 earlycon=ec_imx6q,0x30890000,115200 root=/dev/mmcblk2p2 rootfstype=ext4"
+OSTREE_KERNEL_ARGS_imx8mm-lpddr4-evk ?= "console=tty1 console=ttymxc1,115200 earlycon=ec_imx6q,0x30890000,115200 root=/dev/mmcblk2p2 rootfstype=ext4 shell"
 PREFERRED_PROVIDER_virtual/dtb_imx8mm-lpddr4-evk ?= "lmp-device-tree"
 SOTA_CLIENT_FEATURES_append_imx8mm-lpddr4-evk = " ubootenv"
 MACHINE_FEATURES_remove_imx8mm-lpddr4-evk = "qca9377 qca6174"
