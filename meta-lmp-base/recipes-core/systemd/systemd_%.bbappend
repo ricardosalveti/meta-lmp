@@ -8,6 +8,7 @@ PACKAGECONFIG ?= " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xkbcommon', '', d)} \
     backlight \
     binfmt \
+    gnu-efi \
     gshadow \
     hibernate \
     hostnamed \
@@ -52,6 +53,9 @@ SRC_URI:append = " \
 	file://systemd-timesyncd-update.service \
 "
 
+# Depend on systemd-boot as the efi payload is provided by a different recipe
+RDEPENDS:${PN} += "${@bb.utils.contains('EFI_PROVIDER', 'systemd-boot', 'systemd-boot', '', d)}"
+
 # /var in lmp is expected to be rw, so drop volatile-binds service files
 RDEPENDS:${PN}:remove = "volatile-binds"
 
@@ -69,4 +73,7 @@ do_install:append() {
 	# Workaround for https://github.com/systemd/systemd/issues/11329
 	install -m 0644 ${WORKDIR}/systemd-timesyncd-update.service ${D}${systemd_system_unitdir}
 	ln -sf ../systemd-timesyncd-update.service ${D}${systemd_system_unitdir}/sysinit.target.wants/systemd-timesyncd-update.service
+
+	# Remove systemd-boot as it is provided by a separated recipe and we can't disable via pkgconfig
+	rm -rf ${D}${nonarch_base_libdir}/systemd/boot
 }

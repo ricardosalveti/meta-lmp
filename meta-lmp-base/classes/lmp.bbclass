@@ -11,15 +11,6 @@ include conf/machine/include/lmp-partner-custom.inc
 # Allow customizations per factory level
 include conf/machine/include/lmp-factory-custom.inc
 
-# Done as a rootfs post process hook in order to be part of the ostree image
-sota_fstab_update() {
-	if [ -n "${EFI_PROVIDER}" ]; then
-		echo "LABEL=efi /boot/efi vfat umask=0077 0 1" >> ${IMAGE_ROOTFS}/etc/fstab
-	fi
-}
-
-ROOTFS_POSTPROCESS_COMMAND:append:sota = " sota_fstab_update; "
-
 # Support initial customized target via GARAGE_CUSTOMIZE_TARGET
 # This is set by our CI scripts and allows the initial target to populated by
 # the build process so it can be incorporated at the first aktualizr-lite run
@@ -29,6 +20,37 @@ IMAGE_CMD:ota:append () {
 		${GARAGE_CUSTOMIZE_TARGET} \
 		${OTA_SYSROOT}/ostree/deploy/${OSTREE_OSNAME}/var/sota/import/installed_versions \
 			${GARAGE_TARGET_NAME}-${target_version}
+	fi
+
+	# systemd-boot support
+	if [ "${EFI_PROVIDER}" = "systemd-boot" ]; then
+		if [ "${OSTREE_LOADER_LINK}" != "0" ]; then
+			bbfatal "Systemd-boot requires OSTREE_LOADER_LINK to be set to '0'"
+		fi
+		if [ "${OSTREE_SPLIT_BOOT}" != "1" ]; then
+			bbfatal "Systemd-boot requires OSTREE_SPLIT_BOOT to be set to '1'"
+		fi
+		if [ "${OSTREE_BOOTLOADER}" != "none" ]; then
+			bbfatal "Systemd-boot requires OSTREE_BOOTLOADER to be set to 'none'"
+		fi
+		# As upstream doesn't yet support systemd-boot, we have to undo none and change as needed
+		ostree config --repo=${OTA_SYSROOT}/ostree/repo unset sysroot.bootloader
+		touch ${OTA_SYSROOT}/boot/loader/loader.conf
+		# Remove boot symlink as partition is vfat/ESP
+		rm -f ${OTA_SYSROOT}/boot/boot
+	fi
+
+	# Ostree /boot/loader as link (default) or as directory
+	if [ "${OSTREE_LOADER_LINK}" = "0" ]; then
+		if [ -h ${OTA_SYSROOT}/boot/loader ]; then
+			loader=`readlink ${OTA_SYSROOT}/boot/loader`
+			rm -f ${OTA_SYSROOT}/boot/loader
+			mv ${OTA_SYSROOT}/boot/${loader} ${OTA_SYSROOT}/boot/loader
+			echo -n ${loader} > ${OTA_SYSROOT}/boot/loader/ostree_bootversion
+		else
+			mkdir -p ${OTA_SYSROOT}/boot/loader
+			echo -n "loader.0" > ${OTA_SYSROOT}/boot/loader/ostree_bootversion
+		fi
 	fi
 
 	# Split content from /boot into a separated folder so it can be consumed by WKS separately
