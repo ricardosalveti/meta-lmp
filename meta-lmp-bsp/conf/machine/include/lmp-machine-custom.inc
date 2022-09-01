@@ -248,6 +248,8 @@ KERNEL_IMAGETYPE:sota:mx6ull = "fitImage"
 KERNEL_CLASSES:sota:mx6ull = " kernel-lmp-fitimage "
 WKS_FILE_mx6ull:sota = "sdimage-imx6-spl-fit-sota.wks"
 # iMX6ULL EVK
+PREFERRED_PROVIDER_virtual/kernel:imx6ullevk = "linux-lmp-fslc-imx-rt"
+KERNEL_BUILTIN_WIREGUARD:imx6ullevk = "1"
 SOTA_CLIENT_FEATURES:append:imx6ullevk = " ubootenv"
 UBOOT_MACHINE:imx6ullevk = "mx6ull_14x14_evk_defconfig"
 KERNEL_DEVICETREE:imx6ullevk = "imx6ull-14x14-evk.dtb"
