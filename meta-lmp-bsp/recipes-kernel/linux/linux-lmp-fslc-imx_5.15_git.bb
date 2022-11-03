@@ -28,6 +28,7 @@ SRC_URI:append:imx8mp-lpddr4-evk = " \
 # Add bluetooth support for QCA9377
 SRC_URI:append:imx8mm-lpddr4-evk = " \
     file://0001-FIO-toup-arm64-dts-imx8mm-evk-qca-wifi-enable-suppor.patch \
+    file://0001-evkb.patch \
 "
 # Fix bluetooth reset for Murata 1MW
 SRC_URI:append:imx8mn-ddr4-evk = " \
