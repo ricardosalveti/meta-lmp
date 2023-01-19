@@ -114,6 +114,7 @@ STRIP:pn-linux-tegra:toolchain-clang = "${HOST_PREFIX}strip"
 TOOLCHAIN:pn-optee-os-fio = "gcc"
 TOOLCHAIN:pn-optee-os-tadevkit = "gcc"
 TOOLCHAIN:pn-optee-test = "gcc"
+TOOLCHAIN:pn-optee-client = "gcc"
 TOOLCHAIN:pn-optee-sks = "gcc"
 
 # apalis-imx6-sec
