@@ -475,6 +475,9 @@ KERNEL_CLASSES:sota:mx8mn-generic-bsp = " kernel-lmp-fitimage "
 ## iMX8: Use latest NXP BSP downstream kernel
 PREFERRED_PROVIDER_virtual/kernel:mx8mn-generic-bsp ?= "linux-lmp-fslc-imx"
 WKS_FILE:sota:mx8mn-generic-bsp = "sdimage-imx8-spl-sota.wks.in"
+PREFERRED_VERSION_optee-os-fio:mx8mn-nxp-bsp = "3.20.0-imx"
+PREFERRED_VERSION_optee-os-fio-mfgtool:mx8mn-nxp-bsp = "3.20.0-imx"
+PREFERRED_VERSION_optee-os-tadevkit:mx8mn-nxp-bsp = "3.20.0-imx"
 # iMX8MN DDR4 EVK
 KMACHINE:imx8mn-ddr4-evk = "imx8mn-evk"
 OSTREE_KERNEL_ARGS:imx8mn-ddr4-evk ?= "console=tty1 console=ttymxc1,115200 earlycon=ec_imx6q,0x30890000,115200 rootfstype=ext4"
