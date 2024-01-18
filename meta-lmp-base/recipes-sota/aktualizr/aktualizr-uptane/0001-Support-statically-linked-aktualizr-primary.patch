@@ -1,0 +1,61 @@
+From 65e1ac934cf1c9706a0134ff05d1da9a25dcb6bf Mon Sep 17 00:00:00 2001
+From: Ricardo Salveti <ricardo@foundries.io>
+Date: Thu, 18 Jan 2024 17:12:14 -0300
+Subject: [PATCH] Support statically linked aktualizr primary
+
+Signed-off-by: Ricardo Salveti <ricardo@foundries.io>
+---
+ src/aktualizr_primary/CMakeLists.txt  | 2 +-
+ src/libaktualizr-posix/CMakeLists.txt | 6 +++++-
+ src/virtual_secondary/CMakeLists.txt  | 5 ++---
+ 3 files changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/src/aktualizr_primary/CMakeLists.txt b/src/aktualizr_primary/CMakeLists.txt
+index 5ff32966c..3c3c157ba 100644
+--- a/src/aktualizr_primary/CMakeLists.txt
++++ b/src/aktualizr_primary/CMakeLists.txt
+@@ -2,7 +2,7 @@ set(SOURCES main.cc secondary_config.cc secondary.cc)
+ set(HEADERS secondary_config.h secondary.h)
+ 
+ add_executable(aktualizr ${SOURCES})
+-target_link_libraries(aktualizr aktualizr_lib virtual_secondary aktualizr-posix)
++target_link_libraries(aktualizr aktualizr_static_lib virtual_secondary aktualizr-posix ${AKTUALIZR_EXTERNAL_LIBS})
+ target_include_directories(aktualizr PUBLIC ${PROJECT_SOURCE_DIR}/third_party)
+ 
+ install(TARGETS aktualizr RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT aktualizr)
+diff --git a/src/libaktualizr-posix/CMakeLists.txt b/src/libaktualizr-posix/CMakeLists.txt
+index 31a1004a9..75cea7648 100644
+--- a/src/libaktualizr-posix/CMakeLists.txt
++++ b/src/libaktualizr-posix/CMakeLists.txt
+@@ -4,7 +4,11 @@ set(SOURCES ipuptanesecondary.cc)
+ 
+ set(HEADERS ipuptanesecondary.h)
+ 
+-add_library(aktualizr-posix STATIC ${SOURCES})
++add_library(aktualizr-posix STATIC ${SOURCES}
++    $<TARGET_OBJECTS:asn1>
++    $<TARGET_OBJECTS:asn1_lib>
++    $<TARGET_OBJECTS:primary>
++    $<TARGET_OBJECTS:utilities>)
+ 
+ get_property(ASN1_INCLUDE_DIRS TARGET asn1_lib PROPERTY INCLUDE_DIRECTORIES)
+ target_include_directories(aktualizr-posix PUBLIC ${ASN1_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR})
+diff --git a/src/virtual_secondary/CMakeLists.txt b/src/virtual_secondary/CMakeLists.txt
+index 7d75b4ad3..bb3bd02e5 100644
+--- a/src/virtual_secondary/CMakeLists.txt
++++ b/src/virtual_secondary/CMakeLists.txt
+@@ -4,9 +4,8 @@ set(HEADERS managedsecondary.h virtualsecondary.h)
+ 
+ set(TARGET virtual_secondary)
+ 
+-add_library(${TARGET} STATIC
+-  ${SOURCES}
+-)
++add_library(${TARGET} STATIC ${SOURCES}
++    $<TARGET_OBJECTS:uptane>)
+ 
+ target_include_directories(${TARGET} PUBLIC ${PROJECT_SOURCE_DIR}/src/virtual_secondary)
+ 
+-- 
+2.34.1
+

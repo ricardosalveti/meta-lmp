@@ -1,0 +1,115 @@
+From 077d4062bd8a7d14fceb00b8add3435bd3911f38 Mon Sep 17 00:00:00 2001
+From: Ricardo Salveti <ricardo@foundries.io>
+Date: Thu, 18 Jan 2024 18:14:05 -0300
+Subject: [PATCH] Only install aktualizr primary
+
+Signed-off-by: Ricardo Salveti <ricardo@foundries.io>
+---
+ config/CMakeLists.txt                  | 2 --
+ src/aktualizr_get/CMakeLists.txt       | 2 --
+ src/aktualizr_info/CMakeLists.txt      | 4 ----
+ src/aktualizr_secondary/CMakeLists.txt | 5 -----
+ src/cert_provider/CMakeLists.txt       | 2 --
+ src/libaktualizr/CMakeLists.txt        | 4 ----
+ src/uptane_generator/CMakeLists.txt    | 4 ----
+ 7 files changed, 23 deletions(-)
+
+diff --git a/config/CMakeLists.txt b/config/CMakeLists.txt
+index b9a582060..8056276aa 100644
+--- a/config/CMakeLists.txt
++++ b/config/CMakeLists.txt
+@@ -16,5 +16,3 @@ if(BUILD_DEB)
+         PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+         COMPONENT aktualizr)
+ endif(BUILD_DEB)
+-
+-install(DIRECTORY DESTINATION ${CMAKE_INSTALL_LIBDIR}/sota/conf.d COMPONENT aktualizr)
+diff --git a/src/aktualizr_get/CMakeLists.txt b/src/aktualizr_get/CMakeLists.txt
+index 822851dc0..8aa2b64a6 100644
+--- a/src/aktualizr_get/CMakeLists.txt
++++ b/src/aktualizr_get/CMakeLists.txt
+@@ -2,8 +2,6 @@
+ add_executable(aktualizr-get main.cc get.cc)
+ target_link_libraries(aktualizr-get aktualizr_lib)
+ 
+-install(TARGETS aktualizr-get RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT aktualizr-get)
+-
+ add_aktualizr_test(NAME aktualizr_get
+                    SOURCES get.cc get_test.cc
+                    PROJECT_WORKING_DIRECTORY)
+diff --git a/src/aktualizr_info/CMakeLists.txt b/src/aktualizr_info/CMakeLists.txt
+index 2e9e0807d..600d7b64d 100644
+--- a/src/aktualizr_info/CMakeLists.txt
++++ b/src/aktualizr_info/CMakeLists.txt
+@@ -5,10 +5,6 @@ set(AKTUALIZR_INFO_HEADERS aktualizr_info_config.h)
+ add_executable(aktualizr-info ${AKTUALIZR_INFO_SRC})
+ target_link_libraries(aktualizr-info aktualizr_lib)
+ 
+-install(TARGETS aktualizr-info
+-        COMPONENT aktualizr
+-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+-
+ add_aktualizr_test(NAME aktualizr_info_config
+                    SOURCES aktualizr_info_config.cc aktualizr_info_config_test.cc PROJECT_WORKING_DIRECTORY)
+ 
+diff --git a/src/aktualizr_secondary/CMakeLists.txt b/src/aktualizr_secondary/CMakeLists.txt
+index e7e353a8b..832530c04 100644
+--- a/src/aktualizr_secondary/CMakeLists.txt
++++ b/src/aktualizr_secondary/CMakeLists.txt
+@@ -30,11 +30,6 @@ target_link_libraries(aktualizr_secondary_lib aktualizr-posix ${AKTUALIZR_EXTERN
+ 
+ add_executable(aktualizr-secondary ${AKTUALIZR_SECONDARY_SRC})
+ target_link_libraries(aktualizr-secondary aktualizr_secondary_lib)
+-install(TARGETS aktualizr_secondary_lib LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT aktualizr)
+-
+-install(TARGETS aktualizr-secondary
+-        COMPONENT aktualizr
+-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+ 
+ set(ALL_AKTUALIZR_SECONDARY_HEADERS
+     aktualizr_secondary.h
+diff --git a/src/cert_provider/CMakeLists.txt b/src/cert_provider/CMakeLists.txt
+index a2a462716..534ca7010 100644
+--- a/src/cert_provider/CMakeLists.txt
++++ b/src/cert_provider/CMakeLists.txt
+@@ -25,8 +25,6 @@ target_link_libraries(aktualizr-cert-provider
+ 
+ add_dependencies(build_tests aktualizr-cert-provider)
+ 
+-install(TARGETS aktualizr-cert-provider RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT garage_deploy)
+-
+ add_aktualizr_test(NAME aktualizr_cert_provider SOURCES cert_provider_test.cc PROJECT_WORKING_DIRECTORY ARGS $<TARGET_FILE:aktualizr-cert-provider>)
+ 
+ if (SOTA_PACKED_CREDENTIALS)
+diff --git a/src/libaktualizr/CMakeLists.txt b/src/libaktualizr/CMakeLists.txt
+index 5e5a3e088..ed34de40e 100644
+--- a/src/libaktualizr/CMakeLists.txt
++++ b/src/libaktualizr/CMakeLists.txt
+@@ -72,9 +72,5 @@ add_library(aktualizr_lib SHARED
+ 
+ target_link_libraries(aktualizr_lib ${AKTUALIZR_EXTERNAL_LIBS})
+ set_target_properties(aktualizr_lib PROPERTIES LIBRARY_OUTPUT_NAME aktualizr)
+-install(TARGETS aktualizr_lib LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT aktualizr)
+-install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/libaktualizr DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/../../jsoncpp/json/json.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libaktualizr/json)
+ 
+ configure_file(aktualizr.pc.in aktualizr.pc @ONLY)
+-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/aktualizr.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+diff --git a/src/uptane_generator/CMakeLists.txt b/src/uptane_generator/CMakeLists.txt
+index 21680cacc..0de09527d 100644
+--- a/src/uptane_generator/CMakeLists.txt
++++ b/src/uptane_generator/CMakeLists.txt
+@@ -8,10 +8,6 @@ target_include_directories(uptane_generator_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DI
+ add_executable(uptane-generator main.cc ${UPTANE_GENERATOR_SRC})
+ target_link_libraries(uptane-generator ${UPTANE_GENERATOR_LIBS})
+ 
+-install(TARGETS uptane-generator
+-        COMPONENT aktualizr
+-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+-
+ aktualizr_source_file_checks(${UPTANE_GENERATOR_SRC} ${UPTANE_GENERATOR_HDR})
+ add_aktualizr_test(NAME uptane_generator
+                    SOURCES repo_test.cc
+-- 
+2.34.1
+
