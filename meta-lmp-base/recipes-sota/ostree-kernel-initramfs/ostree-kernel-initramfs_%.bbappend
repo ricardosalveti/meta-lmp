@@ -9,8 +9,8 @@ do_install:append() {
     install -d $ostreeboot
 
     if [ -n "${INITRAMFS_RECOVERY_IMAGE}" ]; then
-        if [ "${KERNEL_IMAGETYPE}" = "fitImage" ]; then
-            cp ${DEPLOY_DIR_IMAGE}/fitImage-${INITRAMFS_RECOVERY_IMAGE}-${MACHINE}-${KERNEL_FIT_LINK_NAME} $ostreeboot/recovery.img
+        if "${@bb.utils.contains('KERNEL_CLASSES', 'kernel-fit-extra-artifacts', 'true', 'false', d)}"; then
+            cp ${DEPLOY_DIR_IMAGE}/fitImage-${INITRAMFS_RECOVERY_IMAGE}-${MACHINE}-${MACHINE} $ostreeboot/recovery.img
         else
             cp ${DEPLOY_DIR_IMAGE}/${INITRAMFS_RECOVERY_IMAGE}-${MACHINE}.${INITRAMFS_FSTYPES} $ostreeboot/recovery.img
         fi
