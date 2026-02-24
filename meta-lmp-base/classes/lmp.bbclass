@@ -121,9 +121,7 @@ IMAGE_CMD:ota:append () {
 
 	# Split content from /boot into a separated folder so it can be consumed by WKS separately
 	if [ "${OSTREE_SPLIT_BOOT}" = "1" ]; then
-		rm -rf ${OTA_BOOT}
-		mv ${OTA_SYSROOT}/boot ${OTA_BOOT}
-		mkdir -p ${OTA_SYSROOT}/boot
+		cp -rf ${OTA_SYSROOT}/boot/* ${OTA_BOOT}/
 	fi
 
 	if [ "${APP_PRELOAD_WITHIN_OE_BUILD}" = "1" ]; then
